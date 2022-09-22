@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: edu.psgv.sweng861.flight_app.AppTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.068 s - in edu.psgv.sweng861.flight_app.AppTest

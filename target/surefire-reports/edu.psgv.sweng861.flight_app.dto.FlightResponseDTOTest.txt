@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: edu.psgv.sweng861.flight_app.dto.FlightResponseDTOTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 s - in edu.psgv.sweng861.flight_app.dto.FlightResponseDTOTest
