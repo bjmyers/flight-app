@@ -8,6 +8,7 @@ import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.psgv.sweng861.flight_app.dto.APICallResponse;
 import edu.psgv.sweng861.flight_app.dto.FlightDate;
 import edu.psgv.sweng861.flight_app.dto.FlightResponseDTO;
 import edu.psgv.sweng861.flight_app.dto.LocationsResponseDTO;
@@ -30,7 +31,7 @@ public class APIClient {
 		this(ClientBuilder.newClient());
 	}
 
-	public FlightResponseDTO callAPI(final String cityFrom, final String cityTo, final FlightDate dateFrom,
+	public APICallResponse callAPI(final String cityFrom, final String cityTo, final FlightDate dateFrom,
 			final FlightDate dateTo) {
 
 		final Invocation inv = client.target(searchURL)
@@ -48,14 +49,22 @@ public class APIClient {
 		
 		final String responseJson = resp.readEntity(String.class);
 		
+		System.out.println(resp.getStatus());
+		if (resp.getStatus() != 200) {
+			return new APICallResponse(false, responseJson, null);
+		}
+		
 		FlightResponseDTO response = null;
 		try {
 			response = mapper.readValue(responseJson, FlightResponseDTO.class);
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+			return new APICallResponse(false, "Unable to parse flight response: " + e.getCause(), null);
 		}
 		
-		return response;
+		if (response.getData().isEmpty()) {
+			return new APICallResponse(false, "No flight found for the given inputs", null);
+		}
+		return new APICallResponse(true, null, response.getData().get(0));
 	}
 	
 	/**

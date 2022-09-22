@@ -21,8 +21,8 @@ import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import edu.psgv.sweng861.flight_app.api.APIClient;
+import edu.psgv.sweng861.flight_app.dto.APICallResponse;
 import edu.psgv.sweng861.flight_app.dto.FlightDate;
-import edu.psgv.sweng861.flight_app.dto.FlightResponseDTO;
 import edu.psgv.sweng861.flight_app.dto.LocationDTO;
 import edu.psgv.sweng861.flight_app.dto.LocationsResponseDTO;
 
@@ -39,9 +39,12 @@ public class UIManager {
 		
 		final LocationsResponseDTO locations = CLIENT.getLocations();
 		locationNameToCode = new HashMap<>();
-		locationNameToCode.put("Philadelphia", "PHL");
-		for (LocationDTO loc: locations.getLocations()) {
-			locationNameToCode.put(loc.getName(), loc.getCode());
+		if (locations.getLocations() != null) {
+			// When there's an error in getting the locations, locationNameToCode will be empty
+			locationNameToCode.put("Philadelphia", "PHL");
+			for (LocationDTO loc: locations.getLocations()) {
+				locationNameToCode.put(loc.getName(), loc.getCode());
+			}
 		}
 		
 		SwingUtilities.invokeLater(new Runnable() {
@@ -66,6 +69,13 @@ public class UIManager {
 	private static void addUserEntryFields(final JFrame frame) {
 		
         frame.setLayout(new GridLayout(4, 1));
+        
+        // Build Text Field to respond to the user
+        final JPanel responsePanel = new JPanel();
+        responsePanel.setLayout(new FlowLayout());
+        
+        final JLabel responseLabel = new JLabel();
+        responsePanel.add(responseLabel);
 		
 		// Build text entry row for entering departure and arrival cities
         final JPanel cityEntryPanel = new JPanel();
@@ -74,6 +84,10 @@ public class UIManager {
         final JLabel cityFromTitle = new JLabel("Departure City");
         cityEntryPanel.add(cityFromTitle);
 
+        if (locationNameToCode.isEmpty()) {
+        	//TODO: Set up default list of cities or allow for manual airport code entry
+        	responseLabel.setText("Unable to Load initial cities, please use manual entry");
+        }
         final String[] cities = locationNameToCode.keySet().toArray(new String[locationNameToCode.size()]);
         Arrays.sort(cities);
 
@@ -104,13 +118,6 @@ public class UIManager {
         final JTextField timeToEntry = new JTextField(getTomorrowsDate().format(), 10);
         timeEntryPanel.add(timeToEntry);
         
-        // Build Text Field to respond to the user
-        final JPanel responsePanel = new JPanel();
-        responsePanel.setLayout(new FlowLayout());
-        
-        final JLabel responseLabel = new JLabel();
-        responsePanel.add(responseLabel);
-        
         // Build button to hit API
         final JPanel executePanel = new JPanel();
         executePanel.setLayout(new FlowLayout());
@@ -134,13 +141,13 @@ public class UIManager {
 				final FlightDate dateTo = parseFlightDate(timeToEntry.getText());
 				final String cityFromCode = locationNameToCode.get(cityFromEntry.getSelectedItem().toString());
 				final String cityToCode = locationNameToCode.get(cityToEntry.getSelectedItem().toString());
-				final FlightResponseDTO response = CLIENT.callAPI(cityFromCode, cityToCode, dateFrom, dateTo);
+				final APICallResponse response = CLIENT.callAPI(cityFromCode, cityToCode, dateFrom, dateTo);
 				
-				if (response.getData().isEmpty()) {
-					responseLabel.setText("No flight found for the given inputs");
+				if (response.wasSuccessful()) {
+					responseLabel.setText("Found Flight with price: " + response.getFlight().getPrice());
 				}
 				else {
-					responseLabel.setText("Found Flight with price: " + response.getData().get(0).getPrice());
+					responseLabel.setText(response.getErrorMessage());
 				}
 			}
         });
