@@ -8,7 +8,8 @@ import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.psgv.sweng861.flight_app.dto.APICallResponse;
+import edu.psgv.sweng861.flight_app.ErrorReporter;
+import edu.psgv.sweng861.flight_app.dto.FlightDTO;
 import edu.psgv.sweng861.flight_app.dto.FlightDate;
 import edu.psgv.sweng861.flight_app.dto.FlightResponseDTO;
 import edu.psgv.sweng861.flight_app.dto.LocationsResponseDTO;
@@ -31,8 +32,8 @@ public class APIClient {
 		this(ClientBuilder.newClient());
 	}
 
-	public APICallResponse callAPI(final String cityFrom, final String cityTo, final FlightDate dateFrom,
-			final FlightDate dateTo) {
+	public FlightDTO callAPI(final ErrorReporter reporter, final String cityFrom, final String cityTo,
+			final FlightDate dateFrom, final FlightDate dateTo) {
 
 		final Invocation inv = client.target(searchURL)
 				.queryParam("fly_from", cityFrom).queryParam("fly_to", cityTo)
@@ -49,31 +50,33 @@ public class APIClient {
 		
 		final String responseJson = resp.readEntity(String.class);
 		
-		System.out.println(resp.getStatus());
 		if (resp.getStatus() != 200) {
-			return new APICallResponse(false, responseJson, null);
+			reporter.addError(responseJson);
+			return null;
 		}
 		
 		FlightResponseDTO response = null;
 		try {
 			response = mapper.readValue(responseJson, FlightResponseDTO.class);
 		} catch (JsonProcessingException e) {
-			return new APICallResponse(false, "Unable to parse flight response: " + e.getCause(), null);
+			reporter.addError("Unable to parse flight response: " + e.getCause());
+			return null;
 		}
 		
 		if (response.getData().isEmpty()) {
-			return new APICallResponse(false, "No flight found for the given inputs", null);
+			reporter.addError("No flight found for the given inputs");
+			return null;
 		}
-		return new APICallResponse(true, null, response.getData().get(0));
+		return response.getData().get(0);
 	}
 	
 	/**
-	 * @return A Response containing the 100 most popular destinations from Philadelphia
+	 * @return A Response containing the 250 most popular destinations from Philadelphia
 	 */
-	public LocationsResponseDTO getLocations() {
+	public LocationsResponseDTO getLocations(final ErrorReporter reporter) {
 		final Invocation inv = client.target(locationURL)
 				.queryParam("term", "PHL").queryParam("locale", "en-US")
-				.queryParam("limit", 100).queryParam("sort", "rank")
+				.queryParam("limit", 250).queryParam("sort", "rank")
 				.queryParam("active_only", true).queryParam("source_popularity", "searches")
 				.request().header("apikey", apiKey).buildGet();
 		
@@ -81,11 +84,17 @@ public class APIClient {
 		
 		final String responseJson = resp.readEntity(String.class);
 		
+		if (resp.getStatus() != 200) {
+			reporter.addError(responseJson);
+			return null;
+		}
+		
 		LocationsResponseDTO response = null;
 		try {
 			response = mapper.readValue(responseJson, LocationsResponseDTO.class);
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+			reporter.addError("Unable to parse available airports: " + e.getCause());
+			return null;
 		}
 		
 		return response;
