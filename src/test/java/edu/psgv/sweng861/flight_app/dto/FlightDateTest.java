@@ -2,12 +2,28 @@ package edu.psgv.sweng861.flight_app.dto;
 
 import static org.junit.Assert.assertEquals;
 
+import java.time.LocalDateTime;
+
 import org.junit.Test;
 
 /**
  * Tests for {@link FlightDate}
  */
 public class FlightDateTest {
+	
+	/**
+	 * Tests building a FlightDate from a LocalDateTime object
+	 */
+	@Test
+	public void testBuildFromLocalDateTime() {
+		final LocalDateTime localDate = LocalDateTime.of(2022, 2, 17, 12, 30);
+		
+		final String expectedString = "17/02/2022";
+		
+		final FlightDate date = new FlightDate(localDate);
+		
+		assertEquals(expectedString, date.format());
+	}
 	
 	/**
 	 * Tests {@link FlightDate#format()} with a double digit day and month

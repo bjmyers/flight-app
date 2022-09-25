@@ -3,8 +3,6 @@
 A project for SWENG 861, hits the Tequila Kiwi API to query about flight prices. JavaX backend for API calls with a Swing frontend
 
 TODO:
-Add Method documentation
-Replace ISO-8601 String formatting in flight display
 Let user enter airport using code rather than from combobox
 Allow for multiple currency types
 Improve look and feel
@@ -22,3 +20,5 @@ Improve display for final flight
 Input validation on date fields
 Test out using all destinations
 Let the user select any destination
+Add Method documentation
+Replace ISO-8601 String formatting in flight display

@@ -1,5 +1,7 @@
 package edu.psgv.sweng861.flight_app.dto;
 
+import java.time.LocalDateTime;
+
 /**
  * A Date object with methods to format it in a manner that the API can
  * understand
@@ -19,6 +21,15 @@ public class FlightDate {
 		this.year = year;
 		this.month = month;
 		this.day = day;
+	}
+	
+	/**
+	 * Alternate constructor which takes in a {@link LocalDateTime} object
+	 * 
+	 * @param date the date to convert to a {@link FlightDate}
+	 */
+	public FlightDate(final LocalDateTime date) {
+		this(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
 	}
 
 	/**
