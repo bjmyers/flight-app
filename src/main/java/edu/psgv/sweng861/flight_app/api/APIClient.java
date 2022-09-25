@@ -1,5 +1,7 @@
 package edu.psgv.sweng861.flight_app.api;
 
+import java.util.Map;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
@@ -38,7 +40,7 @@ public class APIClient {
 		final Invocation inv = client.target(searchURL)
 				.queryParam("fly_from", cityFrom).queryParam("fly_to", cityTo)
 				.queryParam("date_from", dateFrom.format()).queryParam("date_to", dateTo.format())
-				.queryParam("sort", "price").queryParam("limit", 1)
+				.queryParam("sort", "price").queryParam("limit", 1).queryParam("curr", "USD")
 				.queryParam("flight_type", "oneway").queryParam("one_for_city", 0)
 				.queryParam("one_per_date", 0).queryParam("adults", 1).queryParam("children", 0)
 				.queryParam("only_working_days", false).queryParam("only_weekends", false)
@@ -68,6 +70,14 @@ public class APIClient {
 			return null;
 		}
 		return response.getData().get(0);
+	}
+	
+	public FlightDTO callAPI(final ErrorReporter reporter, final Map<String, String> airportNameToCode,
+			final String cityFrom, final FlightDate dateFrom, final FlightDate dateTo) {
+
+		final String cityTo = airportNameToCode.values().stream().reduce("", (s1, s2) -> s1 + "," + s2);
+		
+		return callAPI(reporter, cityFrom, cityTo, dateFrom, dateTo);
 	}
 	
 	/**

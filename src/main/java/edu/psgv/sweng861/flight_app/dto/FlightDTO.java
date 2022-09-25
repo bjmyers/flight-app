@@ -11,6 +11,8 @@ public class FlightDTO {
 	private String cityFrom;
 	private String cityTo;
 	private int price;
+	private String local_departure;
+	private String local_arrival;
 	
 	public FlightDTO() {
 	}
@@ -27,6 +29,14 @@ public class FlightDTO {
 		this.price = price;
 	}
 	
+	public void setLocal_departure(final String localDeparture) {
+		this.local_departure = localDeparture;
+	}
+	
+	public void setLocal_arrival(final String localArrival) {
+		this.local_arrival = localArrival;
+	}
+	
 	public String getCityFrom() {
 		return this.cityFrom;
 	}
@@ -37,6 +47,14 @@ public class FlightDTO {
 	
 	public int getPrice() {
 		return this.price;
+	}
+	
+	public String getLocal_departure() {
+		return this.local_departure;
+	}
+	
+	public String getLocal_arrival() {
+		return this.local_arrival;
 	}
 	
 }

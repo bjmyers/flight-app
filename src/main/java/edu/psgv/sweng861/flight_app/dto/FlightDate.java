@@ -26,5 +26,12 @@ public class FlightDate {
 	public String format() {
 		return String.format("%02d/%02d/%04d", this.day, this.month, this.year);
 	}
+	
+	/**
+	 * @return this date with a YYYY/MM/DD format
+	 */
+	public String displayFormat() {
+		return String.format("%04d/%02d/%02d", this.year, this.month, this.day);
+	}
 
 }

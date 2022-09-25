@@ -3,12 +3,12 @@
 A project for SWENG 861, hits the Tequila Kiwi API to query about flight prices. JavaX backend for API calls with a Swing frontend
 
 TODO:
-
-Improve display for final flight
+Replace ISO-8601 String formatting in flight display
 Let user enter airport using code rather than from combobox
-Test out using all destinations
-	If using all destinations is decently performant, let the user select any destination
 Allow for multiple currency types
+Improve look and feel
+Unit Tests!
+Refactor!
 
 
 DONE:
@@ -17,3 +17,7 @@ Store initial airports so API call not needed on startup
 Figure out why second combobox isn't editable in the same way as the first
 Call API if initial airports is unable to load on startup and warn user
 Add Logging
+Improve display for final flight
+Input validation on date fields
+Test out using all destinations
+Let the user select any destination

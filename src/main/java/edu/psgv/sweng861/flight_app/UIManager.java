@@ -11,11 +11,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
@@ -40,11 +42,12 @@ public class UIManager {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 	
-	private static APIClient CLIENT;
-	private static Map<String, String> locationNameToCode;
-	private static ErrorReporter REPORTER;
+	static APIClient CLIENT;
+	static Map<String, String> locationNameToCode;
+	static ErrorReporter REPORTER;
+	static FlightDisplay FLIGHT_DISPLAY;
 
-	private static String AIRPORT_FILE_PATH = "src/main/resources/edu/psgv/sweng861/flight_app/Airports.json";
+	static String AIRPORT_FILE_PATH = "src/main/resources/edu/psgv/sweng861/flight_app/Airports.json";
 
 	public static void main(final String[] args) {
 		CLIENT = new APIClient();
@@ -92,7 +95,7 @@ public class UIManager {
 	
 	private static void addUserEntryFields(final JFrame frame) {
 		
-        frame.setLayout(new GridLayout(4, 1));
+        frame.setLayout(new GridLayout(7, 1));
         
         // Build Text Field to respond to the user
         final JPanel responsePanel = new JPanel();
@@ -121,6 +124,8 @@ public class UIManager {
         cityEntryPanel.add(cityToTitle);
 
         final JComboBox<String> cityToEntry = new JComboBox<String>(cities);
+        // Starts disabled because we start in any destination mode
+        cityToEntry.setEnabled(false);
         cityEntryPanel.add(cityToEntry);
         AutoCompleteDecorator.decorate(cityToEntry, ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
         
@@ -128,73 +133,124 @@ public class UIManager {
         final JPanel timeEntryPanel = new JPanel();
         timeEntryPanel.setLayout(new FlowLayout());
 
-        final JLabel timeFromTitle = new JLabel("Earliest Time");
+        final JLabel timeFromTitle = new JLabel("Earliest Date");
         timeEntryPanel.add(timeFromTitle);
         
-        final JTextField timeFromEntry = new JTextField(getCurrentDate().format(), 10);
+        final JTextField timeFromEntry = new JTextField(getCurrentDate().displayFormat(), 10);
         timeEntryPanel.add(timeFromEntry);
 
-        final JLabel timeToTitle = new JLabel("Latest Time");
+        final JLabel timeToTitle = new JLabel("Latest Date");
         timeEntryPanel.add(timeToTitle);
         
-        final JTextField timeToEntry = new JTextField(getTomorrowsDate().format(), 10);
+        final JTextField timeToEntry = new JTextField(getTomorrowsDate().displayFormat(), 10);
         timeEntryPanel.add(timeToEntry);
+        
+        // Build radio button group to select entry mode
+        final JRadioButton anyDestinationButton = new JRadioButton("Send me anywhere");
+        anyDestinationButton.setSelected(true);
+        anyDestinationButton.setLayout(new FlowLayout());
+        anyDestinationButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				cityToEntry.setEnabled(false);
+			}
+        });
+        final JRadioButton specificDestinationButton = new JRadioButton("Take me here");
+        specificDestinationButton.setLayout(new FlowLayout());
+        specificDestinationButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				cityToEntry.setEnabled(true);
+			}
+        });
+        final ButtonGroup destinationEntryMode = new ButtonGroup();
+        destinationEntryMode.add(anyDestinationButton);
+        destinationEntryMode.add(specificDestinationButton);
         
         // Build button to hit API
         final JPanel executePanel = new JPanel();
         executePanel.setLayout(new FlowLayout());
 
 		final JButton executeButton = buildExecuteButton(timeFromEntry, timeToEntry, cityFromEntry,
-				cityToEntry);
+				cityToEntry, anyDestinationButton);
 		executePanel.add(executeButton);
+		
+        // Build Text Field to display flights to the user
+        final JPanel flightPanel = new JPanel();
+        flightPanel.setLayout(new FlowLayout());
+        final JLabel display = new JLabel();
+        FLIGHT_DISPLAY = new FlightDisplay(display);
+        flightPanel.add(display);
 
+        frame.add(anyDestinationButton);
+        frame.add(specificDestinationButton);
         frame.add(cityEntryPanel);
         frame.add(timeEntryPanel);
         frame.add(executePanel);
+        frame.add(flightPanel);
         frame.add(responsePanel);
 	}
 
 	private static JButton buildExecuteButton(final JTextField timeFromEntry, final JTextField timeToEntry,
-			final JComboBox<String> cityFromEntry, final JComboBox<String> cityToEntry) {
+			final JComboBox<String> cityFromEntry, final JComboBox<String> cityToEntry,
+			final JRadioButton anyDestinationButton) {
 		final JButton executeButton = new JButton("Find Cheapest Flight");
 		executeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				REPORTER.clearErrors();
+				FLIGHT_DISPLAY.clearFlight();
 				final FlightDate dateFrom = parseFlightDate(timeFromEntry.getText());
 				final FlightDate dateTo = parseFlightDate(timeToEntry.getText());
+				if (dateFrom == null || dateTo == null) {
+					return;
+				}
 				final String cityFromCode = locationNameToCode.get(cityFromEntry.getSelectedItem().toString());
 				final String cityToCode = locationNameToCode.get(cityToEntry.getSelectedItem().toString());
-				final FlightDTO response = CLIENT.callAPI(REPORTER, cityFromCode, cityToCode, dateFrom, dateTo);
+				final FlightDTO response;
+				if (anyDestinationButton.isSelected()) {
+					LOGGER.info("Calling API in any destination mode");
+					response = CLIENT.callAPI(REPORTER, locationNameToCode, cityFromCode, dateFrom, dateTo);
+				}
+				else {
+					LOGGER.info("Calling API in specific mode");
+					response = CLIENT.callAPI(REPORTER, cityFromCode, cityToCode, dateFrom, dateTo);
+				}
 				
 				if (response != null) {
-					//TODO: Report the flight in its own label
-					REPORTER.addWarning("Found Flight with price: " + response.getPrice());
+					FLIGHT_DISPLAY.displayFlight(response);
 				}
 			}
         });
 		return executeButton;
 	}
 	
-	private static FlightDate parseFlightDate(final String input) {
+	static FlightDate parseFlightDate(final String input) {
 		final String[] components = input.split("/");
-		final int day = Integer.parseInt(components[0]);
-		final int month = Integer.parseInt(components[1]);
-		final int year = Integer.parseInt(components[2]);
-		
-		return new FlightDate(year, month, day);
+		if (components.length != 3) {
+			REPORTER.addError(String.format("Unable to parse date %s. Date should be in the form YYYY/MM/DD", input));
+			return null;
+		}
+		try {
+			final int year = Integer.parseInt(components[0]);
+			final int month = Integer.parseInt(components[1]);
+			final int day = Integer.parseInt(components[2]);
+			return new FlightDate(year, month, day);
+		}
+		catch (NumberFormatException e) {
+			REPORTER.addError(String.format("Unable to parse date %s. Date should be in the form YYYY/MM/DD", input));
+		}
+		return null;
 	}
 
-	private static FlightDate getCurrentDate() {
+	static FlightDate getCurrentDate() {
 		final LocalDateTime currentTime = LocalDateTime.now();
 		return new FlightDate(currentTime.getYear(), currentTime.getMonthValue(), currentTime.getDayOfMonth());
 	}
 	
-	private static FlightDate getTomorrowsDate() {
+	static FlightDate getTomorrowsDate() {
 		final LocalDateTime currentTime = LocalDateTime.now().plusDays(1);
 		return new FlightDate(currentTime.getYear(), currentTime.getMonthValue(), currentTime.getDayOfMonth());
 	}
 	
-	private static LocationsResponseDTO getAirportsFromFile(final String filePath) {
+	static LocationsResponseDTO getAirportsFromFile(final String filePath) {
 		LOGGER.info("Retreiving Airports from File");
 
 		final ObjectMapper mapper = new ObjectMapper();
