@@ -41,7 +41,7 @@ import edu.psgv.sweng861.flight_app.dto.LocationsResponseDTO;
 public class UIManager {
 
 	private static final Logger LOGGER = LogManager.getLogger();
-	
+
 	static APIClient CLIENT;
 	static Map<String, String> locationNameToCode;
 	static ErrorReporter REPORTER;
@@ -49,9 +49,14 @@ public class UIManager {
 
 	static String AIRPORT_FILE_PATH = "src/main/resources/edu/psgv/sweng861/flight_app/Airports.json";
 
+	/**
+	 * Main method, builds UI
+	 * 
+	 * @param args unused
+	 */
 	public static void main(final String[] args) {
 		CLIENT = new APIClient();
-		
+
 		// Build Error Reporter to be passed around everywhere
 		final JLabel errorLabel = new JLabel();
 		REPORTER = new ErrorReporter(errorLabel);
@@ -64,23 +69,26 @@ public class UIManager {
 		// Retrieve the locations from a file
 		locationNameToCode = new HashMap<>();
 		if (locations != null && locations.getLocations() != null) {
-			// When there's an error in getting the locations, locationNameToCode will be empty
+			// When there's an error in getting the locations, locationNameToCode will be
+			// empty
 			locationNameToCode.put("Philadelphia", "PHL");
-			for (LocationDTO loc: locations.getLocations()) {
+			for (LocationDTO loc : locations.getLocations()) {
 				locationNameToCode.put(loc.getName(), loc.getCode());
 			}
-		}
-		else {
+		} else {
 			LOGGER.warn("Found no locations in either file or through client");
 		}
-		
+
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				createAndShowGUI();
 			}
 		});
 	}
-	
+
+	/**
+	 * Builds the initial {@link JFrame} and adds user entry fields
+	 */
 	private static void createAndShowGUI() {
         //Create and set up the window.
         final JFrame frame = new JFrame("LeaveOnABudget");
@@ -92,7 +100,12 @@ public class UIManager {
         frame.pack();
         frame.setVisible(true);
 	}
-	
+
+	/**
+	 * Adds fields where the user can enter request parameters
+	 * 
+	 * @param frame The {@link JFrame} where all the fields will be housed
+	 */
 	private static void addUserEntryFields(final JFrame frame) {
 		
         frame.setLayout(new GridLayout(7, 1));
@@ -189,6 +202,23 @@ public class UIManager {
         frame.add(responsePanel);
 	}
 
+	/**
+	 * Builds the button to execute the API call
+	 * 
+	 * @param timeFromEntry        the {@link JTextField} which holds the earliest
+	 *                             date to query
+	 * @param timeToEntry          the {@link JTextField} which holds the latest
+	 *                             date to query
+	 * @param cityFromEntry        the {@link JTextField} which holds the airport
+	 *                             the user is leaving
+	 * @param cityToEntry          the {@link JTextField} which holds the
+	 *                             destination airport, only used in single
+	 *                             destination mode
+	 * @param anyDestinationButton A {@link JRadioButton} which tells if the user
+	 *                             desires to use a single destination or all of
+	 *                             them
+	 * @return a {@link JButton} which executes the API call when pressed
+	 */
 	private static JButton buildExecuteButton(final JTextField timeFromEntry, final JTextField timeToEntry,
 			final JComboBox<String> cityFromEntry, final JComboBox<String> cityToEntry,
 			final JRadioButton anyDestinationButton) {
@@ -221,7 +251,11 @@ public class UIManager {
         });
 		return executeButton;
 	}
-	
+
+	/**
+	 * @param input a date as a String, must be in "YYYY/MM/DD" format
+	 * @return a {@link FlightDate} representing the same date
+	 */
 	static FlightDate parseFlightDate(final String input) {
 		final String[] components = input.split("/");
 		if (components.length != 3) {
@@ -240,16 +274,28 @@ public class UIManager {
 		return null;
 	}
 
+	/**
+	 * @return a {@link FlightDate} representing today's date
+	 */
 	static FlightDate getCurrentDate() {
 		final LocalDateTime currentTime = LocalDateTime.now();
 		return new FlightDate(currentTime.getYear(), currentTime.getMonthValue(), currentTime.getDayOfMonth());
 	}
 	
+	/**
+	 * @return a {@link FlightDate} representing tomorrow's date
+	 */
 	static FlightDate getTomorrowsDate() {
 		final LocalDateTime currentTime = LocalDateTime.now().plusDays(1);
 		return new FlightDate(currentTime.getYear(), currentTime.getMonthValue(), currentTime.getDayOfMonth());
 	}
-	
+
+	/**
+	 * @param filePath path to a file containing the JSON representation of a
+	 *                 {@link LocationsResponseDTO} object
+	 * @return the {@link LocationsResponseDTO} object deserialized from the file's
+	 *         contents
+	 */
 	static LocationsResponseDTO getAirportsFromFile(final String filePath) {
 		LOGGER.info("Retreiving Airports from File");
 

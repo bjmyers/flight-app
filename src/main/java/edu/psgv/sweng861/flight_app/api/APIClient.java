@@ -16,6 +16,9 @@ import edu.psgv.sweng861.flight_app.dto.FlightDate;
 import edu.psgv.sweng861.flight_app.dto.FlightResponseDTO;
 import edu.psgv.sweng861.flight_app.dto.LocationsResponseDTO;
 
+/**
+ * Manages calls to the Tequila Kiwi API
+ */
 public class APIClient {
 	
 	private String apiKey = "b2ihITqOeJqvn2PgXl9dWYtInUTsl1VN";
@@ -26,14 +29,31 @@ public class APIClient {
 	
 	private final Client client;
 	
+	/**
+	 * @param client the Client to use in calls to the API
+	 */
 	public APIClient(final Client client) {
 		this.client = client;
 	}
-	
+
+	/**
+	 * Default constructor, builds a new client
+	 */
 	public APIClient() {
 		this(ClientBuilder.newClient());
 	}
 
+	/**
+	 * @param reporter an {@link ErrorReporter} to report errors to the user
+	 * @param cityFrom string representing the airport code of the city the flight
+	 *                 will leave from
+	 * @param cityTo   string representing the airport code of the city the flight
+	 *                 will arrive at
+	 * @param dateFrom the earliest date to search for flights
+	 * @param dateTo   the latest date to search for flights
+	 * @return The cheapest {@link FlightDTO} returned from the API, or null if no
+	 *         flight can be found
+	 */
 	public FlightDTO callAPI(final ErrorReporter reporter, final String cityFrom, final String cityTo,
 			final FlightDate dateFrom, final FlightDate dateTo) {
 
@@ -71,7 +91,19 @@ public class APIClient {
 		}
 		return response.getData().get(0);
 	}
-	
+
+	/**
+	 * @param reporter          an {@link ErrorReporter} to report errors to the
+	 *                          user
+	 * @param airportNameToCode a map of airport names to codes, all airports should
+	 *                          be used when calling the API
+	 * @param cityFrom          string representing the airport code of the city the
+	 *                          flight will leave from
+	 * @param dateFrom          the earliest date to search for flights
+	 * @param dateTo            the latest date to search for flights
+	 * @return the cheapest flight found by the API, or null if no flight can be
+	 *         found
+	 */
 	public FlightDTO callAPI(final ErrorReporter reporter, final Map<String, String> airportNameToCode,
 			final String cityFrom, final FlightDate dateFrom, final FlightDate dateTo) {
 

@@ -11,21 +11,36 @@ public class LocationDTO {
 	private String name;
 	private String code;
 	
+	/**
+	 * Default constructor needed by Jackson
+	 */
 	public LocationDTO() {
 	}
 	
+	/**
+	 * @param name the name of the airport
+	 */
 	public void setName(final String name) {
 		this.name = name;
 	}
 	
+	/**
+	 * @param code the code of the airport
+	 */
 	public void setCode(final String code) {
 		this.code = code;
 	}
 	
+	/**
+	 * @return the name of the airport
+	 */
 	public String getName() {
 		return this.name;
 	}
 	
+	/**
+	 * @return the code of the airport
+	 */
 	public String getCode() {
 		return this.code;
 	}

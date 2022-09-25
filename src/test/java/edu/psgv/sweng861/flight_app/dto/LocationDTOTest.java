@@ -4,8 +4,14 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+/**
+ * Tests for {@link LocationDTO}
+ */
 public class LocationDTOTest {
 	
+	/**
+	 * Test the setters and getters
+	 */
 	@Test
 	public void testSettersAndGetters() {
 		final String name = "International Space Station";

@@ -12,13 +12,22 @@ public class FlightResponseDTO {
 	
 	private List<FlightDTO> data;
 	
+	/**
+	 * Default constructor needed by Jackson
+	 */
 	public FlightResponseDTO() {
 	}
 	
+	/**
+	 * @param data the flights returned from the API
+	 */
 	public void setData(final List<FlightDTO> data) {
 		this.data = data;
 	}
 	
+	/**
+	 * @return the flights returned from the API
+	 */
 	public List<FlightDTO> getData() {
 		return this.data;
 	}

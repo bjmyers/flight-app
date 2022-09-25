@@ -8,8 +8,14 @@ import java.util.List;
 
 import org.junit.Test;
 
+/**
+ * Tests for {@link LocationsResponseDTO}
+ */
 public class LocationsResponseDTOTest {
 	
+	/**
+	 * Tests the setters and getters
+	 */
 	@Test
 	public void testSettersAndGetters() {
 		final LocationDTO loc = mock(LocationDTO.class);

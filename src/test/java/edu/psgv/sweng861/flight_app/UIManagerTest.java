@@ -21,8 +21,14 @@ import edu.psgv.sweng861.flight_app.dto.FlightDate;
 import edu.psgv.sweng861.flight_app.dto.LocationDTO;
 import edu.psgv.sweng861.flight_app.dto.LocationsResponseDTO;
 
+/**
+ * Tests for {@link UIManager}
+ */
 public class UIManagerTest {
 	
+	/**
+	 * Tests parsing a good date
+	 */
 	@Test
 	public void testParseFlightDate() {
 		final ErrorReporter reporter = mock(ErrorReporter.class);
@@ -68,6 +74,9 @@ public class UIManagerTest {
 		verify(reporter, times(1)).addError(any(String.class));
 	}
 	
+	/**
+	 * Tests getting the current date
+	 */
 	@Test
 	public void getCurrentDateTest() {
 		final LocalDateTime currentTime = LocalDateTime.now();
@@ -80,6 +89,9 @@ public class UIManagerTest {
 		assertEquals(expectedString, actualString);
 	}
 	
+	/**
+	 * Tests getting tomorrow's date
+	 */
 	@Test
 	public void getTomorrowsDateTest() {
 		final LocalDateTime currentTime = LocalDateTime.now().plusDays(1);
@@ -94,7 +106,7 @@ public class UIManagerTest {
 	
 	/**
 	 * Tests getting aircraft from a file
-	 * @throws IOException
+	 * @throws IOException if something goes wrong
 	 */
 	@Test
 	public void getAirportsFromFileTest() throws IOException {
@@ -126,7 +138,7 @@ public class UIManagerTest {
 	
 	/**
 	 * Tests getting the airports from a file when there is no content in the file
-	 * @throws IOException
+	 * @throws IOException if something goes wrong
 	 */
 	@Test
 	public void getAirportsFromFileNoContentTest() throws IOException {
@@ -151,7 +163,7 @@ public class UIManagerTest {
 	
 	/**
 	 * Tests getting the airports from a file when no file exists
-	 * @throws IOException
+	 * @throws IOException if something goes wrong
 	 */
 	@Test
 	public void getAirportsFromFileNoFileTest() throws IOException {

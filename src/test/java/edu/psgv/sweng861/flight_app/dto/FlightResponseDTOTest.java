@@ -11,8 +11,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Tests for {@link FlightResponseDTO}
+ */
 public class FlightResponseDTOTest {
 	
+	/**
+	 * An example response
+	 */
 	private String responseJson = "{\"search_id\": \"75611724-e40c-d4b4-9307-c83bfde6dec4\","
 			+ " \"currency\": \"EUR\", \"fx_rate\": 1, \"data\":"
 			+ " [{\"id\": \"231f243e4b3600009699a92a_0\", \"flyFrom\": \"PHL\", \"flyTo\": \"LAX\","

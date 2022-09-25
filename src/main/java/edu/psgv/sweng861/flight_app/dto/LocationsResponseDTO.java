@@ -12,13 +12,22 @@ public class LocationsResponseDTO {
 	
 	private List<LocationDTO> locations;
 	
+	/**
+	 * Default constructor needed by Jackson
+	 */
 	public LocationsResponseDTO() {
 	}
 	
+	/**
+	 * @param locations the locations which can be flown to
+	 */
 	public void setLocations(final List<LocationDTO> locations) {
 		this.locations = locations;
 	}
 	
+	/**
+	 * @return the locations which can be flown to
+	 */
 	public List<LocationDTO> getLocations() {
 		return this.locations;
 	}
