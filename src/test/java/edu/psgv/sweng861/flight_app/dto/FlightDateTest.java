@@ -60,5 +60,17 @@ public class FlightDateTest {
 		
 		assertEquals(expectedString, actualString);
 	}
+	
+	/**
+	 * Tests {@link FlightDate#displayFormat()}
+	 */
+	@Test
+	public void testDisplayFormat() {
+		final FlightDate date = new FlightDate(2022, 2, 17);
+		final String expectedString = "2022/02/17";
+		final String actualString = date.displayFormat();
+		
+		assertEquals(expectedString, actualString);
+	}
 
 }

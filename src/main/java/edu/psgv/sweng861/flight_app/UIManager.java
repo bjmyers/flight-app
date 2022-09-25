@@ -106,7 +106,7 @@ public class UIManager {
 	 * 
 	 * @param frame The {@link JFrame} where all the fields will be housed
 	 */
-	private static void addUserEntryFields(final JFrame frame) {
+	static void addUserEntryFields(final JFrame frame) {
 		
         frame.setLayout(new GridLayout(7, 1));
         

@@ -7,11 +7,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 import org.junit.Test;
 
@@ -25,6 +31,26 @@ import edu.psgv.sweng861.flight_app.dto.LocationsResponseDTO;
  * Tests for {@link UIManager}
  */
 public class UIManagerTest {
+	
+	/**
+	 * Tests {@link UIManager#addUserEntryFields}
+	 */
+	@Test
+	public void testAddUserInputElements() {
+		final JFrame frame = mock(JFrame.class);
+
+		final ErrorReporter reporter = mock(ErrorReporter.class);
+		when(reporter.getErrorLabel()).thenReturn(new JLabel());
+		UIManager.REPORTER = reporter;
+		
+		UIManager.locationNameToCode = Map.of();
+		
+		UIManager.addUserEntryFields(frame);
+		
+		// Verify all 7 components were successfully built and added to the frame
+		verify(frame, times(7)).add(any(Component.class));
+		
+	}
 	
 	/**
 	 * Tests parsing a good date
