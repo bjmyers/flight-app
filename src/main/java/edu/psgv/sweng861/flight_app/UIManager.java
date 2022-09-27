@@ -4,8 +4,6 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,9 +23,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 
 import edu.psgv.sweng861.flight_app.api.APIClient;
 import edu.psgv.sweng861.flight_app.dto.FlightDTO;
@@ -61,19 +56,15 @@ public class UIManager {
 		final JLabel errorLabel = new JLabel();
 		REPORTER = new ErrorReporter(errorLabel);
 
-		LocationsResponseDTO locations = getAirportsFromFile(AIRPORT_FILE_PATH);
-		if (locations == null) {
-			LOGGER.warn("Null airports from file, calling client for airports");
-			locations = CLIENT.getLocations(REPORTER);
-		}
-		// Retrieve the locations from a file
+		LocationsResponseDTO locations = AirportLoader.getAirports(REPORTER, AIRPORT_FILE_PATH, CLIENT);
+
 		locationNameToCode = new HashMap<>();
 		if (locations != null && locations.getLocations() != null) {
 			// When there's an error in getting the locations, locationNameToCode will be
 			// empty
-			locationNameToCode.put("Philadelphia", "PHL");
+			locationNameToCode.put("Philadelphia (PHL)", "PHL");
 			for (LocationDTO loc : locations.getLocations()) {
-				locationNameToCode.put(loc.getName(), loc.getCode());
+				locationNameToCode.put(String.format("%s (%s)", loc.getName(), loc.getCode()), loc.getCode());
 			}
 		} else {
 			LOGGER.warn("Found no locations in either file or through client");
@@ -288,31 +279,6 @@ public class UIManager {
 	static FlightDate getTomorrowsDate() {
 		final LocalDateTime currentTime = LocalDateTime.now().plusDays(1);
 		return new FlightDate(currentTime.getYear(), currentTime.getMonthValue(), currentTime.getDayOfMonth());
-	}
-
-	/**
-	 * @param filePath path to a file containing the JSON representation of a
-	 *                 {@link LocationsResponseDTO} object
-	 * @return the {@link LocationsResponseDTO} object deserialized from the file's
-	 *         contents
-	 */
-	static LocationsResponseDTO getAirportsFromFile(final String filePath) {
-		LOGGER.info("Retreiving Airports from File");
-
-		final ObjectMapper mapper = new ObjectMapper();
-		final ObjectReader reader = mapper.readerFor(LocationsResponseDTO.class);
-		try {
-			final LocationsResponseDTO response = reader.readValue(new File(filePath));
-			if (response.getLocations() == null) {
-				REPORTER.addWarning("Found no Airports in static List, attempting to dynamically load Airports");
-				return null;
-			}
-			LOGGER.info("Retrieved " + response.getLocations().size() + " airports");
-			return response;
-		} catch (IOException e) {
-			REPORTER.addWarning("Unable to read in static Airport List, attempting to dynamically load Airports");
-		}
-		return null;
 	}
 
 }

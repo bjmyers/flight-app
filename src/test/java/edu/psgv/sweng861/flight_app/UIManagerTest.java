@@ -10,10 +10,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.awt.Component;
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.JFrame;
@@ -21,11 +18,7 @@ import javax.swing.JLabel;
 
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import edu.psgv.sweng861.flight_app.dto.FlightDate;
-import edu.psgv.sweng861.flight_app.dto.LocationDTO;
-import edu.psgv.sweng861.flight_app.dto.LocationsResponseDTO;
 
 /**
  * Tests for {@link UIManager}
@@ -128,77 +121,6 @@ public class UIManagerTest {
 		final String actualString = UIManager.getTomorrowsDate().format();
 		
 		assertEquals(expectedString, actualString);
-	}
-	
-	/**
-	 * Tests getting aircraft from a file
-	 * @throws IOException if something goes wrong
-	 */
-	@Test
-	public void getAirportsFromFileTest() throws IOException {
-		final ErrorReporter reporter = mock(ErrorReporter.class);
-		UIManager.REPORTER = reporter;
-		
-		// Build temp file
-		final File file = File.createTempFile("airports", "json", new File("src/main/resources"));
-		file.deleteOnExit();
-		final String filePath = file.getAbsolutePath();
-		
-		// Add data to the file
-		final LocationDTO loc1 = new LocationDTO();
-		loc1.setName("King of Prussia");
-		loc1.setCode("KOP");
-		final LocationDTO loc2 = new LocationDTO();
-		loc2.setName("Penn State University");
-		loc2.setCode("PSU");
-		final LocationsResponseDTO response = new LocationsResponseDTO();
-		response.setLocations(List.of(loc1, loc2));
-		
-		final ObjectMapper mapper = new ObjectMapper();
-		mapper.writeValue(file, response);
-		
-		final LocationsResponseDTO actualResponse = UIManager.getAirportsFromFile(filePath);
-		assertEquals(2, actualResponse.getLocations().size());
-		verifyNoInteractions(reporter);
-	}
-	
-	/**
-	 * Tests getting the airports from a file when there is no content in the file
-	 * @throws IOException if something goes wrong
-	 */
-	@Test
-	public void getAirportsFromFileNoContentTest() throws IOException {
-		final ErrorReporter reporter = mock(ErrorReporter.class);
-		UIManager.REPORTER = reporter;
-		
-		// Build temp file
-		final File file = File.createTempFile("airports", "json", new File("src/main/resources"));
-		file.deleteOnExit();
-		final String filePath = file.getAbsolutePath();
-		
-		// Add data to the file
-		final LocationsResponseDTO response = new LocationsResponseDTO();
-		
-		final ObjectMapper mapper = new ObjectMapper();
-		mapper.writeValue(file, response);
-		
-		final LocationsResponseDTO actualResponse = UIManager.getAirportsFromFile(filePath);
-		assertNull(actualResponse);
-		verify(reporter).addWarning(any(String.class));
-	}
-	
-	/**
-	 * Tests getting the airports from a file when no file exists
-	 * @throws IOException if something goes wrong
-	 */
-	@Test
-	public void getAirportsFromFileNoFileTest() throws IOException {
-		final ErrorReporter reporter = mock(ErrorReporter.class);
-		UIManager.REPORTER = reporter;
-
-		final LocationsResponseDTO actualResponse = UIManager.getAirportsFromFile("FakeFile.json");
-		assertNull(actualResponse);
-		verify(reporter).addWarning(any(String.class));
 	}
 	
 }
