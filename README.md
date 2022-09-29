@@ -3,7 +3,7 @@
 A project for SWENG 861, hits the Tequila Kiwi API to query about flight prices. JavaX backend for API calls with a Swing frontend
 
 TODO:
-Let user enter airport using code rather than from combobox
+Defect: Entering invalid code doesn't seem to matter
 Allow for multiple currency types
 Let user select number of adults and number of children
 Allow for layovers, find way of displaying multi-leg flight
@@ -24,3 +24,4 @@ Add Method documentation
 Replace ISO-8601 String formatting in flight display
 Have airport combobox include both name and code in selection "Los Angeles (LAX)"
 Refactor locations loader into its own class
+Let user enter airport using code rather than from combobox

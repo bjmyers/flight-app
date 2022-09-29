@@ -4,25 +4,24 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
-import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import edu.psgv.sweng861.flight_app.api.APIClient;
 import edu.psgv.sweng861.flight_app.dto.FlightDTO;
@@ -99,7 +98,7 @@ public class UIManager {
 	 */
 	static void addUserEntryFields(final JFrame frame) {
 		
-        frame.setLayout(new GridLayout(7, 1));
+        frame.setLayout(new GridLayout(8, 1));
         
         // Build Text Field to respond to the user
         final JPanel responsePanel = new JPanel();
@@ -107,32 +106,24 @@ public class UIManager {
 		responsePanel.add(REPORTER.getErrorLabel());
 		
 		// Build text entry row for entering departure and arrival cities
-        final JPanel cityEntryPanel = new JPanel();
-        cityEntryPanel.setLayout(new FlowLayout());
+		final JPanel cityEntryPanel = new JPanel();
+		final AirportEntryPanel airportEntryPanel = new AirportEntryPanel(REPORTER, cityEntryPanel, locationNameToCode);
+		
+		// Build toggle between manual and auto entry modes
+		final JToggleButton airportEntryToggle = new JToggleButton("Enter Airport Code Manually");
+		airportEntryToggle.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent itemEvent) {
+				if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+					airportEntryPanel.switchToManualEntry();
+				} else {
+					airportEntryPanel.switchToComboEntry();
+				}
+			}
+		});
+        final JPanel airportEntryToggleFrame = new JPanel();
+        airportEntryToggleFrame.setLayout(new FlowLayout());
+        airportEntryToggleFrame.add(airportEntryToggle);
 
-        final JLabel cityFromTitle = new JLabel("Departure City");
-        cityEntryPanel.add(cityFromTitle);
-
-        if (locationNameToCode.isEmpty()) {
-        	//TODO: Allow manual entry lol
-        	REPORTER.addError("Unable to Load initial cities, please use manual entry");
-        }
-        final String[] cities = locationNameToCode.keySet().toArray(new String[locationNameToCode.size()]);
-        Arrays.sort(cities);
-
-		final JComboBox<String> cityFromEntry = new JComboBox<String>(cities);
-		cityEntryPanel.add(cityFromEntry);
-        AutoCompleteDecorator.decorate(cityFromEntry, ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
-
-        final JLabel cityToTitle = new JLabel("Arrival City");
-        cityEntryPanel.add(cityToTitle);
-
-        final JComboBox<String> cityToEntry = new JComboBox<String>(cities);
-        // Starts disabled because we start in any destination mode
-        cityToEntry.setEnabled(false);
-        cityEntryPanel.add(cityToEntry);
-        AutoCompleteDecorator.decorate(cityToEntry, ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
-        
 		// Build text entry row for entering time range to search
         final JPanel timeEntryPanel = new JPanel();
         timeEntryPanel.setLayout(new FlowLayout());
@@ -155,14 +146,14 @@ public class UIManager {
         anyDestinationButton.setLayout(new FlowLayout());
         anyDestinationButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				cityToEntry.setEnabled(false);
+				airportEntryPanel.disableCityTo();
 			}
         });
         final JRadioButton specificDestinationButton = new JRadioButton("Take me here");
         specificDestinationButton.setLayout(new FlowLayout());
         specificDestinationButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				cityToEntry.setEnabled(true);
+				airportEntryPanel.enableCityTo();
 			}
         });
         final ButtonGroup destinationEntryMode = new ButtonGroup();
@@ -173,8 +164,8 @@ public class UIManager {
         final JPanel executePanel = new JPanel();
         executePanel.setLayout(new FlowLayout());
 
-		final JButton executeButton = buildExecuteButton(timeFromEntry, timeToEntry, cityFromEntry,
-				cityToEntry, anyDestinationButton);
+		final JButton executeButton = buildExecuteButton(airportEntryPanel, timeFromEntry, timeToEntry,
+				anyDestinationButton);
 		executePanel.add(executeButton);
 		
         // Build Text Field to display flights to the user
@@ -187,6 +178,7 @@ public class UIManager {
         frame.add(anyDestinationButton);
         frame.add(specificDestinationButton);
         frame.add(cityEntryPanel);
+        frame.add(airportEntryToggleFrame);
         frame.add(timeEntryPanel);
         frame.add(executePanel);
         frame.add(flightPanel);
@@ -196,23 +188,19 @@ public class UIManager {
 	/**
 	 * Builds the button to execute the API call
 	 * 
+	 * @param airportEntryPanel    the {@link AirportEntryPanel} which handles
+	 *                             airport entry
 	 * @param timeFromEntry        the {@link JTextField} which holds the earliest
 	 *                             date to query
 	 * @param timeToEntry          the {@link JTextField} which holds the latest
 	 *                             date to query
-	 * @param cityFromEntry        the {@link JTextField} which holds the airport
-	 *                             the user is leaving
-	 * @param cityToEntry          the {@link JTextField} which holds the
-	 *                             destination airport, only used in single
-	 *                             destination mode
 	 * @param anyDestinationButton A {@link JRadioButton} which tells if the user
 	 *                             desires to use a single destination or all of
 	 *                             them
 	 * @return a {@link JButton} which executes the API call when pressed
 	 */
-	private static JButton buildExecuteButton(final JTextField timeFromEntry, final JTextField timeToEntry,
-			final JComboBox<String> cityFromEntry, final JComboBox<String> cityToEntry,
-			final JRadioButton anyDestinationButton) {
+	private static JButton buildExecuteButton(final AirportEntryPanel airportEntryPanel, final JTextField timeFromEntry,
+			final JTextField timeToEntry, final JRadioButton anyDestinationButton) {
 		final JButton executeButton = new JButton("Find Cheapest Flight");
 		executeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -223,8 +211,8 @@ public class UIManager {
 				if (dateFrom == null || dateTo == null) {
 					return;
 				}
-				final String cityFromCode = locationNameToCode.get(cityFromEntry.getSelectedItem().toString());
-				final String cityToCode = locationNameToCode.get(cityToEntry.getSelectedItem().toString());
+				final String cityFromCode = airportEntryPanel.getCityFromCode();
+				final String cityToCode = airportEntryPanel.getCityToCode();
 				final FlightDTO response;
 				if (anyDestinationButton.isSelected()) {
 					LOGGER.info("Calling API in any destination mode");
