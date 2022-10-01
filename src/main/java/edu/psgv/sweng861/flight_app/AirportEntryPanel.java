@@ -107,14 +107,14 @@ public class AirportEntryPanel {
 		if (this.comboMode) {
 			return locationNameToCode.get(this.cityFromBox.getSelectedItem().toString());
 		}
-		return this.cityFromField.getText();
+		return this.cityFromField.getText().toUpperCase();
 	}
 	
 	public String getCityToCode() {
 		if (this.comboMode) {
 			return locationNameToCode.get(this.cityToBox.getSelectedItem().toString());
 		}
-		return this.cityToField.getText();
+		return this.cityToField.getText().toUpperCase();
 	}
 
 }

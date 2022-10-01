@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.JTextArea;
 
 import org.junit.Test;
 
@@ -33,7 +33,7 @@ public class UIManagerTest {
 		final JFrame frame = mock(JFrame.class);
 
 		final ErrorReporter reporter = mock(ErrorReporter.class);
-		when(reporter.getErrorLabel()).thenReturn(new JLabel());
+		when(reporter.getErrorLabel()).thenReturn(new JTextArea());
 		UIManager.REPORTER = reporter;
 		
 		UIManager.locationNameToCode = Map.of();

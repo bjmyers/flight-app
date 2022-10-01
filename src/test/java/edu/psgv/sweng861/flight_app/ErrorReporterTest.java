@@ -3,7 +3,7 @@ package edu.psgv.sweng861.flight_app;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import javax.swing.JLabel;
+import javax.swing.JTextArea;
 
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ public class ErrorReporterTest {
 	 */
 	@Test
 	public void testAccessor() {
-		final JLabel label = new JLabel();
+		final JTextArea label = new JTextArea();
 		
 		final ErrorReporter reporter = new ErrorReporter(label);
 		
@@ -29,7 +29,7 @@ public class ErrorReporterTest {
 	 */
 	@Test
 	public void testAddError() {
-		final JLabel label = new JLabel();
+		final JTextArea label = new JTextArea();
 
 		final ErrorReporter reporter = new ErrorReporter(label);
 
@@ -44,7 +44,7 @@ public class ErrorReporterTest {
 	 */
 	@Test
 	public void testAddWarning() {
-		final JLabel label = new JLabel();
+		final JTextArea label = new JTextArea();
 
 		final ErrorReporter reporter = new ErrorReporter(label);
 
@@ -59,7 +59,7 @@ public class ErrorReporterTest {
 	 */
 	@Test
 	public void testAddAndClear() {
-		final JLabel label = new JLabel();
+		final JTextArea label = new JTextArea();
 
 		final ErrorReporter reporter = new ErrorReporter(label);
 

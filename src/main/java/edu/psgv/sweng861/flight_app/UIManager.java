@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
@@ -52,7 +53,9 @@ public class UIManager {
 		CLIENT = new APIClient();
 
 		// Build Error Reporter to be passed around everywhere
-		final JLabel errorLabel = new JLabel();
+		final JTextArea errorLabel = new JTextArea(1, 60);
+		errorLabel.setEditable(false);
+		errorLabel.setLineWrap(true);
 		REPORTER = new ErrorReporter(errorLabel);
 
 		LocationsResponseDTO locations = AirportLoader.getAirports(REPORTER, AIRPORT_FILE_PATH, CLIENT);

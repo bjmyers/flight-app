@@ -1,6 +1,6 @@
 package edu.psgv.sweng861.flight_app;
 
-import javax.swing.JLabel;
+import javax.swing.JTextArea;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,24 +12,24 @@ public class ErrorReporter {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 	
-	private JLabel errorDisplay;
+	private JTextArea errorDisplay;
 	private String errorString;
 
 	/**
 	 * Constructor
 	 * 
-	 * @param errorDisplay The {@link JLabel} which will display error and warnings
+	 * @param errorDisplay The {@link JTextArea} which will display error and warnings
 	 */
-	public ErrorReporter(final JLabel errorDisplay) {
+	public ErrorReporter(final JTextArea errorDisplay) {
 		this.errorDisplay = errorDisplay;
 		this.errorString = "";
 		this.errorDisplay.setText(this.errorString);
 	}
 
 	/**
-	 * @return the {@link JLabel} stored in this reporter
+	 * @return the {@link JTextArea} stored in this reporter
 	 */
-	public JLabel getErrorLabel() {
+	public JTextArea getErrorLabel() {
 		return this.errorDisplay;
 	}
 
@@ -71,10 +71,10 @@ public class ErrorReporter {
 	 */
 	private void addText(final String message, final String prefix) {
 		if (!this.errorString.isEmpty()) {
-			this.errorString += "<br/>";
+			this.errorString += "\n";
 		}
 		this.errorString += prefix + ": " + message;
-		final String textRepr = "<html>" + this.errorString + "</html>";
+		final String textRepr = this.errorString;
 		this.errorDisplay.setText(textRepr);
 	}
 

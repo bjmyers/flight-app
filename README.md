@@ -3,7 +3,6 @@
 A project for SWENG 861, hits the Tequila Kiwi API to query about flight prices. JavaX backend for API calls with a Swing frontend
 
 TODO:
-Display airport code in response so user can enter it manually
 Allow for multiple currency types
 Let user select number of adults and number of children
 Allow for layovers, find way of displaying multi-leg flight
@@ -26,3 +25,5 @@ Have airport combobox include both name and code in selection "Los Angeles (LAX)
 Refactor locations loader into its own class
 Let user enter airport using code rather than from combobox
 Load airports dynamically in any destination mode
+Display airport code in response so user can enter it manually
+Improve Error wrapping
