@@ -1,11 +1,12 @@
 package edu.psgv.sweng861.flight_app.api;
 
-import java.util.Map;
-
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Response;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,6 +21,8 @@ import edu.psgv.sweng861.flight_app.dto.LocationsResponseDTO;
  * Manages calls to the Tequila Kiwi API
  */
 public class APIClient {
+
+	private static final Logger LOGGER = LogManager.getLogger();
 	
 	private String apiKey = "b2ihITqOeJqvn2PgXl9dWYtInUTsl1VN";
 	private String searchURL = "https://api.tequila.kiwi.com/v2/search";
@@ -72,6 +75,8 @@ public class APIClient {
 		
 		final String responseJson = resp.readEntity(String.class);
 		
+		LOGGER.debug("API Response: " + responseJson);
+		
 		if (resp.getStatus() != 200) {
 			reporter.addError(responseJson);
 			return null;
@@ -89,27 +94,10 @@ public class APIClient {
 			reporter.addError("No flight found for the given inputs");
 			return null;
 		}
-		return response.getData().get(0);
-	}
-
-	/**
-	 * @param reporter          an {@link ErrorReporter} to report errors to the
-	 *                          user
-	 * @param airportNameToCode a map of airport names to codes, all airports should
-	 *                          be used when calling the API
-	 * @param cityFrom          string representing the airport code of the city the
-	 *                          flight will leave from
-	 * @param dateFrom          the earliest date to search for flights
-	 * @param dateTo            the latest date to search for flights
-	 * @return the cheapest flight found by the API, or null if no flight can be
-	 *         found
-	 */
-	public FlightDTO callAPI(final ErrorReporter reporter, final Map<String, String> airportNameToCode,
-			final String cityFrom, final FlightDate dateFrom, final FlightDate dateTo) {
-
-		final String cityTo = airportNameToCode.values().stream().reduce("", (s1, s2) -> s1 + "," + s2);
 		
-		return callAPI(reporter, cityFrom, cityTo, dateFrom, dateTo);
+		LOGGER.info("Found Flight");
+		
+		return response.getData().get(0);
 	}
 	
 	/**

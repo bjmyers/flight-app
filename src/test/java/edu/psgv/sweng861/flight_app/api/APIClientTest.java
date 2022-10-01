@@ -10,8 +10,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.Map;
-
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.Invocation.Builder;
@@ -198,47 +196,6 @@ public class APIClientTest {
 
 		assertNull(response);
 		verify(reporter, times(1)).addError(any(String.class));
-	}
-	
-	/**
-	 * Tests {@link APIClient#callAPI} with all airports
-	 */
-	@Test
-	public void testCallAPIAllAirports() {
-		
-		final Client client = mock(Client.class);
-		final WebTarget target = mock(WebTarget.class);
-		when(client.target(any(String.class))).thenReturn(target);
-
-		when(target.queryParam(any(String.class), any())).thenReturn(target);
-		
-		final Builder builder = mock(Builder.class);
-		when(target.request()).thenReturn(builder);
-		
-		when(builder.header(any(String.class), any())).thenReturn(builder);
-		
-		final Invocation inv = mock(Invocation.class);
-		when(builder.buildGet()).thenReturn(inv);
-		
-		final Response resp = mock(Response.class);
-		when(resp.getStatus()).thenReturn(200);
-		when(inv.invoke()).thenReturn(resp);
-
-		final String responseJson = "{\"data\": [ {\"cityTo\": \"LA\", \"cityFrom\": \"PHL\", \"price\": 100} ] }";
-		when(resp.readEntity(String.class)).thenReturn(responseJson);
-
-		final FlightDate dateTo = new FlightDate(2022, 10, 11);
-		final FlightDate dateFrom = new FlightDate(2022, 10, 12);
-		
-		final ErrorReporter reporter = mock(ErrorReporter.class);
-		
-		final Map<String, String> airportMap = Map.of("Los Angeles", "LAX", "Philadelphia", "PHL");
-		
-		final APIClient apiClient = new APIClient(client);
-		final FlightDTO response = apiClient.callAPI(reporter, airportMap, "JFK", dateTo, dateFrom);
-		
-		assertEquals(100, response.getPrice());
-		verifyNoInteractions(reporter);
 	}
 	
 	/**

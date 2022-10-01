@@ -216,7 +216,8 @@ public class UIManager {
 				final FlightDTO response;
 				if (anyDestinationButton.isSelected()) {
 					LOGGER.info("Calling API in any destination mode");
-					response = CLIENT.callAPI(REPORTER, locationNameToCode, cityFromCode, dateFrom, dateTo);
+					// Use an empty string as the cityTo argument to use any destination
+					response = CLIENT.callAPI(REPORTER, cityFromCode, "", dateFrom, dateTo);
 				}
 				else {
 					LOGGER.info("Calling API in specific mode");
