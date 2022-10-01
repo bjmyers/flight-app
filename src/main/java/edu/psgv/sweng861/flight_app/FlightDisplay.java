@@ -29,9 +29,9 @@ public class FlightDisplay {
 	 */
 	public void displayFlight(final FlightDTO flight) {
 		final String textToDisplay = String.format(
-				"<html>Cheapest direct flight from %s to %s: $%d<br>Leaves at %s and arrives at %s local time</html>",
-				flight.getCityFrom(), flight.getCityTo(), flight.getPrice(), formatDate(flight.getLocal_departure()),
-				formatDate(flight.getLocal_arrival()));
+				"<html>Cheapest direct flight from %s (%s) to %s (%s): $%d<br>Leaves at %s and arrives at %s local time</html>",
+				flight.getCityFrom(), flight.getCityCodeFrom(), flight.getCityTo(), flight.getCityCodeTo(),
+				flight.getPrice(), formatDate(flight.getLocal_departure()), formatDate(flight.getLocal_arrival()));
 		this.display.setText(textToDisplay);
 	}
 

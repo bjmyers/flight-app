@@ -9,7 +9,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class FlightDTO {
 	
 	private String cityFrom;
+	private String cityCodeFrom;
 	private String cityTo;
+	private String cityCodeTo;
 	private int price;
 	private String local_departure;
 	private String local_arrival;
@@ -21,17 +23,31 @@ public class FlightDTO {
 	}
 	
 	/**
-	 * @param cityFrom the airport code of the city the flight is leaving
+	 * @param cityFrom the airport name of the city the flight is leaving
 	 */
 	public void setCityFrom(final String cityFrom) {
 		this.cityFrom = cityFrom;
 	}
 	
 	/**
-	 * @param cityTo the airport code of the city the flight is arriving at
+	 * @param cityCodeFrom the airport code of the city the flight is leaving
+	 */
+	public void setCityCodeFrom(final String cityCodeFrom) {
+		this.cityCodeFrom = cityCodeFrom;
+	}
+	
+	/**
+	 * @param cityTo the airport name of the city the flight is arriving at
 	 */
 	public void setCityTo(final String cityTo) {
 		this.cityTo = cityTo;
+	}
+	
+	/**
+	 * @param cityCodeTo the airport code of the city the flight is arriving at
+	 */
+	public void setCityCodeTo(final String cityCodeTo) {
+		this.cityCodeTo = cityCodeTo;
 	}
 	
 	/**
@@ -56,17 +72,31 @@ public class FlightDTO {
 	}
 	
 	/**
-	 * @return the airport code of the city the flight is leaving
+	 * @return the airport name of the city the flight is leaving
 	 */
 	public String getCityFrom() {
 		return this.cityFrom;
 	}
 	
 	/**
-	 * return the airport code of the city the flight is arriving at
+	 * @return the airport code of the city the flight is leaving
+	 */
+	public String getCityCodeFrom() {
+		return this.cityCodeFrom;
+	}
+	
+	/**
+	 * return the airport name of the city the flight is arriving at
 	 */
 	public String getCityTo() {
 		return this.cityTo;
+	}
+	
+	/**
+	 * return the airport code of the city the flight is arriving at
+	 */
+	public String getCityCodeTo() {
+		return this.cityCodeTo;
 	}
 	
 	/**
