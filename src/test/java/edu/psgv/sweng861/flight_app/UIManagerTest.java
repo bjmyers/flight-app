@@ -40,8 +40,8 @@ public class UIManagerTest {
 		
 		UIManager.addUserEntryFields(frame);
 		
-		// Verify all 8 components were successfully built and added to the frame
-		verify(frame, times(8)).add(any(Component.class));
+		// Verify all 9 components were successfully built and added to the frame
+		verify(frame, times(9)).add(any(Component.class));
 		
 	}
 	
@@ -90,6 +90,55 @@ public class UIManagerTest {
 		final FlightDate date = UIManager.parseFlightDate(input);
 		
 		assertNull(date);
+		verify(reporter, times(1)).addError(any(String.class));
+	}
+	
+	/**
+	 * Tests {@link UIManager#parsePositiveNumber} in the happy case
+	 */
+	@Test
+	public void testParsePositiveNumber() {
+		final ErrorReporter reporter = mock(ErrorReporter.class);
+		UIManager.REPORTER = reporter;
+		
+		final String input = "5";
+		final Integer expectedOutput = 5;
+		
+		final Integer output = UIManager.parsePositiveNumber(input);
+		
+		assertEquals(expectedOutput, output);
+		verifyNoInteractions(reporter);
+	}
+	
+	/**
+	 * Tests {@link UIManager#parsePositiveNumber} when the input isn't a number
+	 */
+	@Test
+	public void testParsePositiveNumberNonNumber() {
+		final ErrorReporter reporter = mock(ErrorReporter.class);
+		UIManager.REPORTER = reporter;
+		
+		final String input = "Hello";
+		
+		final Integer output = UIManager.parsePositiveNumber(input);
+		
+		assertNull(output);
+		verify(reporter, times(1)).addError(any(String.class));
+	}
+	
+	/**
+	 * Tests {@link UIManager#parsePositiveNumber} when the input is a negative number
+	 */
+	@Test
+	public void testParsePositiveNumberNegativeNumber() {
+		final ErrorReporter reporter = mock(ErrorReporter.class);
+		UIManager.REPORTER = reporter;
+		
+		final String input = "-3";
+		
+		final Integer output = UIManager.parsePositiveNumber(input);
+		
+		assertNull(output);
 		verify(reporter, times(1)).addError(any(String.class));
 	}
 	

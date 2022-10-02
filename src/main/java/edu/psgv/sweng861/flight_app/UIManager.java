@@ -101,7 +101,7 @@ public class UIManager {
 	 */
 	static void addUserEntryFields(final JFrame frame) {
 		
-        frame.setLayout(new GridLayout(8, 1));
+        frame.setLayout(new GridLayout(9, 1));
         
         // Build Text Field to respond to the user
         final JPanel responsePanel = new JPanel();
@@ -143,6 +143,22 @@ public class UIManager {
         final JTextField timeToEntry = new JTextField(getTomorrowsDate().displayFormat(), 10);
         timeEntryPanel.add(timeToEntry);
         
+        // Build fields to enter number of adults and children
+        final JPanel passengersPanel = new JPanel();
+        timeEntryPanel.setLayout(new FlowLayout());
+        
+        final JLabel adultsTitle = new JLabel("Number of Adults flying:");
+        passengersPanel.add(adultsTitle);
+        
+        final JTextField adultsEntry = new JTextField("1", 10);
+        passengersPanel.add(adultsEntry);
+
+        final JLabel childrenTitle = new JLabel("Number of Children flying:");
+        passengersPanel.add(childrenTitle);
+        
+        final JTextField childrenEntry = new JTextField("0", 10);
+        passengersPanel.add(childrenEntry);
+        
         // Build radio button group to select entry mode
         final JRadioButton anyDestinationButton = new JRadioButton("Send me anywhere");
         anyDestinationButton.setSelected(true);
@@ -168,7 +184,7 @@ public class UIManager {
         executePanel.setLayout(new FlowLayout());
 
 		final JButton executeButton = buildExecuteButton(airportEntryPanel, timeFromEntry, timeToEntry,
-				anyDestinationButton);
+				adultsEntry, childrenEntry, anyDestinationButton);
 		executePanel.add(executeButton);
 		
         // Build Text Field to display flights to the user
@@ -183,6 +199,7 @@ public class UIManager {
         frame.add(cityEntryPanel);
         frame.add(airportEntryToggleFrame);
         frame.add(timeEntryPanel);
+        frame.add(passengersPanel);
         frame.add(executePanel);
         frame.add(flightPanel);
         frame.add(responsePanel);
@@ -197,34 +214,46 @@ public class UIManager {
 	 *                             date to query
 	 * @param timeToEntry          the {@link JTextField} which holds the latest
 	 *                             date to query
+	 * @param adultEntry           the {@link JTextField} which holds the number of
+	 *                             adults
+	 * @param childrenEntry        the {@link JTextField} which holds the number of
+	 *                             children
 	 * @param anyDestinationButton A {@link JRadioButton} which tells if the user
 	 *                             desires to use a single destination or all of
 	 *                             them
 	 * @return a {@link JButton} which executes the API call when pressed
 	 */
 	private static JButton buildExecuteButton(final AirportEntryPanel airportEntryPanel, final JTextField timeFromEntry,
-			final JTextField timeToEntry, final JRadioButton anyDestinationButton) {
+			final JTextField timeToEntry, final JTextField adultEntry, final JTextField childrenEntry,
+			final JRadioButton anyDestinationButton) {
 		final JButton executeButton = new JButton("Find Cheapest Flight");
 		executeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				REPORTER.clearErrors();
 				FLIGHT_DISPLAY.clearFlight();
+				
 				final FlightDate dateFrom = parseFlightDate(timeFromEntry.getText());
 				final FlightDate dateTo = parseFlightDate(timeToEntry.getText());
 				if (dateFrom == null || dateTo == null) {
 					return;
 				}
+				final Integer adults = parsePositiveNumber(adultEntry.getText());
+				final Integer children = parsePositiveNumber(childrenEntry.getText());
+				if (adults == null || children == null) {
+					return;
+				}
+				
 				final String cityFromCode = airportEntryPanel.getCityFromCode();
 				final String cityToCode = airportEntryPanel.getCityToCode();
 				final FlightDTO response;
 				if (anyDestinationButton.isSelected()) {
 					LOGGER.info("Calling API in any destination mode");
 					// Use an empty string as the cityTo argument to use any destination
-					response = CLIENT.callAPI(REPORTER, cityFromCode, "", dateFrom, dateTo);
+					response = CLIENT.callAPI(REPORTER, cityFromCode, "", dateFrom, dateTo, adults, children);
 				}
 				else {
 					LOGGER.info("Calling API in specific mode");
-					response = CLIENT.callAPI(REPORTER, cityFromCode, cityToCode, dateFrom, dateTo);
+					response = CLIENT.callAPI(REPORTER, cityFromCode, cityToCode, dateFrom, dateTo, adults, children);
 				}
 				
 				if (response != null) {
@@ -255,6 +284,26 @@ public class UIManager {
 			REPORTER.addError(String.format("Unable to parse date %s. Date should be in the form YYYY/MM/DD", input));
 		}
 		return null;
+	}
+	
+	/**
+	 * @param input a String to parse and convert to a positive integer
+	 * @return
+	 */
+	static Integer parsePositiveNumber(final String input) {
+		final Integer output;
+		try {
+			output = Integer.valueOf(input);
+		}
+		catch (NumberFormatException e) {
+			REPORTER.addError("Unable to Parse input value: " + input);
+			return null;
+		}
+		if (output != null && output < 0) {
+			REPORTER.addError("Input value must be positive: " + input);
+			return null;
+		}
+		return output;
 	}
 
 	/**

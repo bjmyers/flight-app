@@ -75,7 +75,7 @@ public class APIClientTest {
 		final ErrorReporter reporter = mock(ErrorReporter.class);
 		
 		final APIClient apiClient = new APIClient(client);
-		final FlightDTO response = apiClient.callAPI(reporter, "PHL", "LA", dateTo, dateFrom);
+		final FlightDTO response = apiClient.callAPI(reporter, "PHL", "LA", dateTo, dateFrom, 1, 0);
 		
 		assertEquals(100, response.getPrice());
 		verifyNoInteractions(reporter);
@@ -114,7 +114,7 @@ public class APIClientTest {
 		final ErrorReporter reporter = mock(ErrorReporter.class);
 		
 		final APIClient apiClient = new APIClient(client);
-		final FlightDTO response = apiClient.callAPI(reporter, "PHL", "LA", dateTo, dateFrom);
+		final FlightDTO response = apiClient.callAPI(reporter, "PHL", "LA", dateTo, dateFrom, 1, 0);
 		
 		assertNull(response);
 		verify(reporter, times(1)).addError(any(String.class));
@@ -153,7 +153,7 @@ public class APIClientTest {
 		final ErrorReporter reporter = mock(ErrorReporter.class);
 		
 		final APIClient apiClient = new APIClient(client);
-		final FlightDTO response = apiClient.callAPI(reporter, "PHL", "LA", dateTo, dateFrom);
+		final FlightDTO response = apiClient.callAPI(reporter, "PHL", "LA", dateTo, dateFrom, 1, 0);
 
 		assertNull(response);
 		verify(reporter, times(1)).addError(any(String.class));
@@ -192,7 +192,7 @@ public class APIClientTest {
 		final ErrorReporter reporter = mock(ErrorReporter.class);
 		
 		final APIClient apiClient = new APIClient(client);
-		final FlightDTO response = apiClient.callAPI(reporter, "PHL", "LA", dateTo, dateFrom);
+		final FlightDTO response = apiClient.callAPI(reporter, "PHL", "LA", dateTo, dateFrom, 1, 0);
 
 		assertNull(response);
 		verify(reporter, times(1)).addError(any(String.class));

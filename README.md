@@ -4,7 +4,6 @@ A project for SWENG 861, hits the Tequila Kiwi API to query about flight prices.
 
 TODO:
 Allow for multiple currency types
-Let user select number of adults and number of children
 Allow for layovers, find way of displaying multi-leg flight
 Improve look and feel
 
@@ -27,3 +26,4 @@ Let user enter airport using code rather than from combobox
 Load airports dynamically in any destination mode
 Display airport code in response so user can enter it manually
 Improve Error wrapping
+Let user select number of adults and number of children
