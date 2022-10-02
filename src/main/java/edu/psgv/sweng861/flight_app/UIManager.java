@@ -150,14 +150,20 @@ public class UIManager {
         final JLabel adultsTitle = new JLabel("Number of Adults flying:");
         passengersPanel.add(adultsTitle);
         
-        final JTextField adultsEntry = new JTextField("1", 10);
+        final JTextField adultsEntry = new JTextField("1", 3);
         passengersPanel.add(adultsEntry);
 
         final JLabel childrenTitle = new JLabel("Number of Children flying:");
         passengersPanel.add(childrenTitle);
         
-        final JTextField childrenEntry = new JTextField("0", 10);
+        final JTextField childrenEntry = new JTextField("0", 3);
         passengersPanel.add(childrenEntry);
+
+        final JLabel infantsTitle = new JLabel("Number of Infants flying:");
+        passengersPanel.add(infantsTitle);
+        
+        final JTextField infantsEntry = new JTextField("0", 3);
+        passengersPanel.add(infantsEntry);
         
         // Build radio button group to select entry mode
         final JRadioButton anyDestinationButton = new JRadioButton("Send me anywhere");
@@ -184,7 +190,7 @@ public class UIManager {
         executePanel.setLayout(new FlowLayout());
 
 		final JButton executeButton = buildExecuteButton(airportEntryPanel, timeFromEntry, timeToEntry,
-				adultsEntry, childrenEntry, anyDestinationButton);
+				adultsEntry, childrenEntry, infantsEntry, anyDestinationButton);
 		executePanel.add(executeButton);
 		
         // Build Text Field to display flights to the user
@@ -218,6 +224,8 @@ public class UIManager {
 	 *                             adults
 	 * @param childrenEntry        the {@link JTextField} which holds the number of
 	 *                             children
+	 * @param infantsEntry         the {@link JTextField} which holds the number of
+	 *                             infants
 	 * @param anyDestinationButton A {@link JRadioButton} which tells if the user
 	 *                             desires to use a single destination or all of
 	 *                             them
@@ -225,7 +233,7 @@ public class UIManager {
 	 */
 	private static JButton buildExecuteButton(final AirportEntryPanel airportEntryPanel, final JTextField timeFromEntry,
 			final JTextField timeToEntry, final JTextField adultEntry, final JTextField childrenEntry,
-			final JRadioButton anyDestinationButton) {
+			final JTextField infantsEntry, final JRadioButton anyDestinationButton) {
 		final JButton executeButton = new JButton("Find Cheapest Flight");
 		executeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -239,7 +247,8 @@ public class UIManager {
 				}
 				final Integer adults = parsePositiveNumber(adultEntry.getText());
 				final Integer children = parsePositiveNumber(childrenEntry.getText());
-				if (adults == null || children == null) {
+				final Integer infants = parsePositiveNumber(infantsEntry.getText());
+				if (adults == null || children == null || infants == null) {
 					return;
 				}
 				
@@ -249,13 +258,13 @@ public class UIManager {
 				if (anyDestinationButton.isSelected()) {
 					LOGGER.info("Calling API in any destination mode");
 					// Use an empty string as the cityTo argument to use any destination
-					response = CLIENT.callAPI(REPORTER, cityFromCode, "", dateFrom, dateTo, adults, children);
-				}
-				else {
+					response = CLIENT.callAPI(REPORTER, cityFromCode, "", dateFrom, dateTo, adults, children, infants);
+				} else {
 					LOGGER.info("Calling API in specific mode");
-					response = CLIENT.callAPI(REPORTER, cityFromCode, cityToCode, dateFrom, dateTo, adults, children);
+					response = CLIENT.callAPI(REPORTER, cityFromCode, cityToCode, dateFrom, dateTo, adults, children,
+							infants);
 				}
-				
+
 				if (response != null) {
 					FLIGHT_DISPLAY.displayFlight(response);
 				}

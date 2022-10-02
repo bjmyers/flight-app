@@ -56,26 +56,29 @@ public class APIClient {
 	 * @param dateTo   the latest date to search for flights
 	 * @param adults   the number of adults flying
 	 * @param children the number of children flying
+	 * @param infants  the number of infants flying
 	 * @return The cheapest {@link FlightDTO} returned from the API, or null if no
 	 *         flight can be found
 	 */
 	public FlightDTO callAPI(final ErrorReporter reporter, final String cityFrom, final String cityTo,
-			final FlightDate dateFrom, final FlightDate dateTo, final Integer adults, final Integer children) {
+			final FlightDate dateFrom, final FlightDate dateTo, final Integer adults, final Integer children,
+			final Integer infants) {
 
-		final Invocation inv = client.target(searchURL).queryParam("fly_from", cityFrom).queryParam("fly_to", cityTo)
+		final Invocation inv = client.target(searchURL).queryParam("fly_from", cityFrom).queryParam(
+				"fly_to", cityTo)
 				.queryParam("date_from", dateFrom.format()).queryParam("date_to", dateTo.format())
 				.queryParam("sort", "price").queryParam("limit", 1).queryParam("curr", "USD")
 				.queryParam("flight_type", "oneway").queryParam("one_for_city", 0).queryParam("one_per_date", 0)
-				.queryParam("adults", adults).queryParam("children", children).queryParam("only_working_days", false)
-				.queryParam("only_weekends", false).queryParam("partner_market", "us").queryParam("max_stopovers", 0)
-				.queryParam("max_sector_stopovers", 0).queryParam("vehicle_type", "aircraft").request()
-				.header("apikey", apiKey).buildGet();
+				.queryParam("adults", adults).queryParam("children", children).queryParam("infants", infants)
+				.queryParam("only_working_days", false).queryParam("only_weekends", false)
+				.queryParam("partner_market", "us").queryParam("max_stopovers", 0).queryParam("max_sector_stopovers", 0)
+				.queryParam("vehicle_type", "aircraft").request().header("apikey", apiKey).buildGet();
 
 		final Response resp = inv.invoke();
 		
 		final String responseJson = resp.readEntity(String.class);
 		
-		LOGGER.debug("API Response: " + responseJson);
+		LOGGER.info("API Response: " + responseJson);
 		
 		if (resp.getStatus() != 200) {
 			reporter.addError(responseJson);

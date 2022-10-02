@@ -3,6 +3,8 @@
 A project for SWENG 861, hits the Tequila Kiwi API to query about flight prices. JavaX backend for API calls with a Swing frontend
 
 TODO:
+Give user more info about how to find cheapest flight
+Add dummy book button
 Allow for multiple currency types
 Allow for layovers, find way of displaying multi-leg flight
 Improve look and feel
@@ -27,3 +29,4 @@ Load airports dynamically in any destination mode
 Display airport code in response so user can enter it manually
 Improve Error wrapping
 Let user select number of adults and number of children
+Add infants input
