@@ -40,8 +40,8 @@ public class UIManagerTest {
 		
 		UIManager.addUserEntryFields(frame);
 		
-		// Verify all 9 components were successfully built and added to the frame
-		verify(frame, times(9)).add(any(Component.class));
+		// Verify all 10 components were successfully built and added to the frame
+		verify(frame, times(10)).add(any(Component.class));
 		
 	}
 	

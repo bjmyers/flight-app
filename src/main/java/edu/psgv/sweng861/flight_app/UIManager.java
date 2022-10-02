@@ -101,7 +101,7 @@ public class UIManager {
 	 */
 	static void addUserEntryFields(final JFrame frame) {
 		
-        frame.setLayout(new GridLayout(9, 1));
+        frame.setLayout(new GridLayout(10, 1));
         
         // Build Text Field to respond to the user
         final JPanel responsePanel = new JPanel();
@@ -193,6 +193,18 @@ public class UIManager {
 				adultsEntry, childrenEntry, infantsEntry, anyDestinationButton);
 		executePanel.add(executeButton);
 		
+		// Dummy book button, doesn't do anything yet
+		final JPanel bookPanel = new JPanel();
+		bookPanel.setLayout(new FlowLayout());
+
+		final JButton bookButton = new JButton("Book Flight");
+		bookButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				REPORTER.addError("Booking not implemented");
+			}
+		});
+		bookPanel.add(bookButton);
+		
         // Build Text Field to display flights to the user
         final JPanel flightPanel = new JPanel();
         flightPanel.setLayout(new FlowLayout());
@@ -208,6 +220,7 @@ public class UIManager {
         frame.add(passengersPanel);
         frame.add(executePanel);
         frame.add(flightPanel);
+        frame.add(bookPanel);
         frame.add(responsePanel);
 	}
 
