@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -256,12 +258,26 @@ public class UIManager {
 				final FlightDate dateFrom = parseFlightDate(timeFromEntry.getText());
 				final FlightDate dateTo = parseFlightDate(timeToEntry.getText());
 				if (dateFrom == null || dateTo == null) {
+					// There was a problem parsing the dates
+					return;
+				}
+				if (!dateTo.isAfter(dateFrom)) {
+					REPORTER.addError("Earliest date must be before latest date");
 					return;
 				}
 				final Integer adults = parsePositiveNumber(adultEntry.getText());
 				final Integer children = parsePositiveNumber(childrenEntry.getText());
 				final Integer infants = parsePositiveNumber(infantsEntry.getText());
 				if (adults == null || children == null || infants == null) {
+					// There was a problem parsing the passengers
+					return;
+				}
+				if (infants > adults) {
+					REPORTER.addError("There must be at least one adult for every infant");
+					return;
+				}
+				if (adults + children + infants > 9) {
+					REPORTER.addError("No more than 9 passengers are supported per search");
 					return;
 				}
 				
@@ -288,7 +304,7 @@ public class UIManager {
 
 	/**
 	 * @param input a date as a String, must be in "YYYY/MM/DD" format
-	 * @return a {@link FlightDate} representing the same date
+	 * @return a {@link FlightDate} representing the same date, or null if there is a problem
 	 */
 	static FlightDate parseFlightDate(final String input) {
 		final String[] components = input.split("/");
@@ -300,17 +316,21 @@ public class UIManager {
 			final int year = Integer.parseInt(components[0]);
 			final int month = Integer.parseInt(components[1]);
 			final int day = Integer.parseInt(components[2]);
-			return new FlightDate(year, month, day);
+			final LocalDate date = LocalDate.of(year, month, day);
+			return new FlightDate(date);
 		}
 		catch (NumberFormatException e) {
 			REPORTER.addError(String.format("Unable to parse date %s. Date should be in the form YYYY/MM/DD", input));
+		}
+		catch (DateTimeException e) {
+			REPORTER.addError(String.format("Invalid Date: %s", input));
 		}
 		return null;
 	}
 	
 	/**
 	 * @param input a String to parse and convert to a positive integer
-	 * @return
+	 * @return the positive number, or null if there is a problem
 	 */
 	static Integer parsePositiveNumber(final String input) {
 		final Integer output;

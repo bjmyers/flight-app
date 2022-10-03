@@ -78,7 +78,7 @@ public class APIClient {
 		
 		final String responseJson = resp.readEntity(String.class);
 		
-		LOGGER.info("API Response: " + responseJson);
+		LOGGER.debug("API Response: " + responseJson);
 		
 		if (resp.getStatus() != 200) {
 			reporter.addError(responseJson);

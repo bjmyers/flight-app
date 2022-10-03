@@ -3,10 +3,10 @@
 A project for SWENG 861, hits the Tequila Kiwi API to query about flight prices. JavaX backend for API calls with a Swing frontend
 
 TODO:
+Improve client side validation
 Give user more info about how to find cheapest flight
 Allow for multiple currency types
 Allow for layovers, find way of displaying multi-leg flight
-Improve look and feel
 
 
 DONE:
